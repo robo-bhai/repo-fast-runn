@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadi88 - App Store</title>
+    <!-- Tailwind CSS CDN for High Rich UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-header {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-3px);
+            transition: all 0.3s ease;
+        }
+        /* Custom Scrollbar for Slider */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- 1. Static Header -->
+    <header class="glass-header sticky top-0 z-50 border-b border-gray-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Branding -->
+            <a href="#" class="text-2xl font-extrabold tracking-wider text-amber-400 flex items-center gap-2">
+                <span>⚡</span> HADI<span class="text-white">88</span>
+            </a>
+            <!-- Search Bar -->
+            <div class="relative w-1/2 md:w-1/3">
+                <input type="text" id="searchInput" placeholder="Search apps..." 
+                    class="w-full bg-gray-900/80 text-sm text-gray-200 placeholder-gray-400 px-4 py-2 rounded-full border border-gray-700 focus:outline-none focus:border-amber-400 transition">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-3 py-6 w-full space-y-8">
+
+        <!-- 2. Slider for New/Category-wise Apps -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">🔥 New & Featured Apps</h2>
+            </div>
+            <!-- Horizontal Slider -->
+            <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                {% for app in apps|slice:":5" %}
+                <div class="glass-card min-w-[200px] md:min-w-[240px] p-3 rounded-2xl flex-shrink-0 cursor-pointer">
+                    <div class="h-28 bg-gradient-to-br from-amber-500/20 to-purple-600/20 rounded-xl mb-3 flex items-center justify-center text-3xl">🚀</div>
+                    <h3 class="font-semibold text-sm truncate text-gray-100">{{ app.title }}</h3>
+                    <span class="text-xs text-amber-400">v{{ app.version_name }} • Build {{ app.version_code }}</span>
+                </div>
+                {% empty %}
+                <div class="glass-card min-w-[200px] p-3 rounded-2xl flex-shrink-0">
+                    <p class="text-xs text-gray-400">No featured apps yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- 3. All Apps Section (3 in a row layout) -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-200">📦 Explore All Apps</h2>
+                <span class="text-xs text-gray-400" id="appCount">Active Store</span>
+            </div>
+
+            <!-- Grid: 3 items per row -->
+            <div id="appGrid" class="grid grid-cols-3 gap-3 md:gap-6">
+                
+                {% for app in apps %}
+                <!-- App Card Item -->
+                <div class="glass-card p-2 md:p-4 rounded-xl md:rounded-2xl flex flex-col justify-between app-card" data-name="{{ app.title|lower }}">
+                    <div>
+                        <div class="w-full h-16 md:h-32 bg-gray-800 rounded-lg md:rounded-xl mb-2 flex items-center justify-center text-xl md:text-3xl">📱</div>
+                        <h3 class="font-semibold text-xs md:text-base truncate text-gray-100">{{ app.title }}</h3>
+                        <p class="text-[10px] md:text-xs text-gray-400 line-clamp-2 mt-1">{{ app.release_notes }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] md:text-xs text-amber-400 font-mono">v{{ app.version_name }}</span>
+                            <span class="text-[9px] md:text-xs text-gray-400">{{ app.file_size_mb }} MB</span>
+                        </div>
+                        {% if app.apk_file %}
+                        <a href="{{ app.apk_file.url }}" class="w-full block text-center bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-[10px] md:text-sm py-1.5 md:py-2 rounded-lg transition">Download</a>
+                        {% else %}
+                        <span class="w-full block text-center bg-gray-700 text-gray-400 font-bold text-[10px] md:text-sm py-1.5 md:py-2 rounded-lg">Unavailable</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-3 text-center py-12 glass-card rounded-2xl">
+                    <p class="text-gray-400 text-sm">No apps available in the store right now. Check back soon!</p>
+                </div>
+                {% endfor %}
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-auto">
+        &copy; 2026 Hadi88 App Store. All rights reserved.
+    </footer>
+
+    <!-- JavaScript for Live Search -->
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const appCards = document.querySelectorAll('.app-card');
+
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            appCards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

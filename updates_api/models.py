@@ -2,6 +2,12 @@ from django.db import models
 import os
 
 class AppVersion(models.Model):
+    # Added title field to match the App Store frontend template
+    title = models.CharField(
+        max_length=200,
+        default="BatVoice Pro",
+        help_text="App Name / Title (e.g. BatVoice Pro)"
+    )
     version_code = models.PositiveIntegerField(
         unique=True,
         help_text="Integer version code (e.g. 2, 3, 4). Must be higher than installed version."
@@ -47,5 +53,18 @@ class AppVersion(models.Model):
                 pass
         super().save(*args, **kwargs)
 
+    # Properties to perfectly match the HTML template variables
+    @property
+    def version(self):
+        return self.version_name
+
+    @property
+    def description(self):
+        return self.release_notes
+
+    @property
+    def file_size(self):
+        return f"{self.file_size_mb} MB"
+
     def __str__(self):
-        return f"v{self.version_name} (Build {self.version_code}) - {'Active' if self.is_active else 'Inactive'}"
+        return f"{self.title} - v{self.version_name} (Build {self.version_code}) - {'Active' if self.is_active else 'Inactive'}"

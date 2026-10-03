@@ -8,7 +8,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('updates_api.urls')),
+    # App Store home page direct root par (hadi88.online/)
+    path('', include('updates_api.urls')),
+    
+    # Agar aap purani /api/ check-update bhi sath chalana chahte hain toh ye rakhein:
+    # path('api/', include('updates_api.urls')),
 ]
 
 if settings.DEBUG:
