@@ -1,4 +1,4 @@
-name: Fast BatVoice Server with GDrive & Cloudflare Tunnel
+name: Fast BatVoice Server with GDrive, Superuser & Cloudflare Tunnel
 
 on:
   workflow_dispatch:
@@ -29,17 +29,36 @@ jobs:
           mkdir -p ~/.config/rclone
           echo "$RCLONE_CONF_DATA" > ~/.config/rclone/rclone.conf
 
-      - name: Restore Database & Media (APKs) from Google Drive
+      - name: Restore Database & Media (APKs) from Google Drive (Zero Loss)
         run: |
-          # Google Drive se purana database aur APKs wapas le aao
-          rclone copy gdrive:batvoice_backup/db.sqlite3 ./ || true
-          rclone copy gdrive:batvoice_backup/media/ ./media/ || true
+          echo "Restoring database and media from Google Drive..."
+          rclone copy gdrive:batvoice_backup/db.sqlite3 ./ || echo "No previous DB found, starting fresh."
+          rclone copy gdrive:batvoice_backup/media/ ./media/ || echo "No previous media found."
 
-      - name: Run Migrations & Start Django Server
+      - name: Run Migrations & Ensure Superuser Exists
+        env:
+          DJANGO_SUPERUSER_USERNAME: ${{ secrets.SUPERUSER_NAME }}
+          DJANGO_SUPERUSER_PASSWORD: ${{ secrets.SUPERUSER_PASSWORD }}
+          DJANGO_SUPERUSER_EMAIL: "admin@uqn88.store"
         run: |
           python manage.py migrate
+          
+          # Yeh script check karegi ke agar user pehle se nahi hai toh naya bana degi automatically
+          python manage.py shell -c "
+          from django.contrib.auth import get_user_model;
+          User = get_user_model();
+          username = '$DJANGO_SUPERUSER_USERNAME';
+          if username and not User.objects.filter(username=username).exists():
+              User.objects.create_superuser(username=username, password='$DJANGO_SUPERUSER_PASSWORD', email='$DJANGO_SUPERUSER_EMAIL')
+              print(f'Superuser {username} created successfully!')
+          else:
+              print('Superuser already exists or username is empty.')
+          "
+
+      - name: Start Django Server in Background
+        run: |
           python manage.py runserver 0.0.0.0:8000 &
-          sleep 2
+          sleep 3
 
       - name: Start Cloudflare Tunnel (Permanent Domain)
         env:
@@ -60,10 +79,9 @@ jobs:
           # Server ko 2 ghante (7200 seconds) tak live rakhne ke liye
           sleep 7200
 
-      - name: Backup Database & APKs back to Google Drive before Exit
-        if: always() # Chahe action timeout ho ya cancel, yeh data Google Drive par save kar dega
+      - name: Backup Database & APKs back to Google Drive before Exit (Zero Loss)
+        if: always() # Chahe action timeout ho ya cancel, yeh step chal kar data Google Drive par save kar dega
         run: |
           echo "Backing up database and media/APKs to Google Drive..."
           rclone copy ./db.sqlite3 gdrive:batvoice_backup/ || true
           rclone copy ./media/ gdrive:batvoice_backup/media/ || true
-
