@@ -1,0 +1,69 @@
+name: Fast BatVoice Server with GDrive & Cloudflare Tunnel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Rclone & Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          sudo -v ; curl https://rclone.org/install.sh | sudo bash
+
+      - name: Setup Rclone Config from GitHub Secret
+        env:
+          RCLONE_CONF_DATA: ${{ secrets.RCLONE_CONFIG }}
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "$RCLONE_CONF_DATA" > ~/.config/rclone/rclone.conf
+
+      - name: Restore Database & Media (APKs) from Google Drive
+        run: |
+          # Google Drive se purana database aur APKs wapas le aao
+          rclone copy gdrive:batvoice_backup/db.sqlite3 ./ || true
+          rclone copy gdrive:batvoice_backup/media/ ./media/ || true
+
+      - name: Run Migrations & Start Django Server
+        run: |
+          python manage.py migrate
+          python manage.py runserver 0.0.0.0:8000 &
+          sleep 2
+
+      - name: Start Cloudflare Tunnel (Permanent Domain)
+        env:
+          TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+        run: |
+          if [ ! -f "./cloudflared" ]; then
+            curl -L --output cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+            chmod +x cloudflared
+          fi
+
+          echo "=========================================="
+          echo " Server is live at: https://update-bat.uqn88.store"
+          echo "=========================================="
+
+          # Named tunnel run jo aapke subdomain par traffic bhejega
+          ./cloudflared tunnel run --token "$TUNNEL_TOKEN" &
+
+          # Server ko 2 ghante (7200 seconds) tak live rakhne ke liye
+          sleep 7200
+
+      - name: Backup Database & APKs back to Google Drive before Exit
+        if: always() # Chahe action timeout ho ya cancel, yeh data Google Drive par save kar dega
+        run: |
+          echo "Backing up database and media/APKs to Google Drive..."
+          rclone copy ./db.sqlite3 gdrive:batvoice_backup/ || true
+          rclone copy ./media/ gdrive:batvoice_backup/media/ || true
+
