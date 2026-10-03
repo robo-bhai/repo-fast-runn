@@ -11,7 +11,12 @@ SECRET_KEY = 'django-insecure-batvoice-ota-update-secret-key-replace-in-producti
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'update-bat.uqn88.store',
+    'localhost',
+    '127.0.0.1',
+]
+
 
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
