@@ -11,19 +11,13 @@ SECRET_KEY = 'django-insecure-batvoice-ota-update-secret-key-replace-in-producti
 
 DEBUG = True
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://update-bat.uqn88.store',
-    'https://hadi88.online',
-    'https://www.hadi88.online',
-    'https://store.hadi88.online',
+ALLOWED_HOSTS = [
+    'update-bat.uqn88.store',
+    'localhost',
+    '127.0.0.1',
 ]
 
 
-ALLOWED_HOSTS = ['*']
-
-# Cloudflare Reverse Proxy & Secure Headers Fix for 400 Bad Request
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
 from django.core.files import locks
@@ -45,9 +39,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'batvoice_server.settings.Debug400Middleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,25 +47,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# --- DEBUG 400 ERROR MIDDLEWARE ---
-import traceback
-from django.http import HttpResponse
-
-class Debug400Middleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response = self.get_response(request)
-        return response
-
-    def process_exception(self, request, exception):
-        print("=== 400 / EXCEPTION CAUGHT ===")
-        traceback.print_exc()
-        return None
-
-
 
 ROOT_URLCONF = 'batvoice_server.urls'
 
@@ -109,12 +82,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
-# Cloudflare Reverse Proxy settings
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -133,9 +100,4 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://update-bat.uqn88.store',
-    'https://store.hadi88.online',
-    'https://www.hadi88.online',
 ]
-# WhiteNoise Static Files Storage configuration for Production/Cloudflare Tunnel
-# WhiteNoise Static Files configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'

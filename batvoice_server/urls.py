@@ -7,13 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # 1. Admin panel sirf /admin/ par
     path('admin/', admin.site.urls),
-    
-    # 2. App Store home page direct root par (e.g., https://update-bat.uqn88.store/)
-    path('', include('updates_api.urls')),
-    
-    # 3. Agar mobile app purani /api/ check-update URL use kar rahi hai toh yeh bhi sath active rahega
     path('api/', include('updates_api.urls')),
 ]
 
