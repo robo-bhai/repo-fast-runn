@@ -11,7 +11,13 @@ SECRET_KEY = 'django-insecure-batvoice-ota-update-secret-key-replace-in-producti
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'update-bat.uqn88.store',
+    'localhost',
+    '127.0.0.1',
+    '*'
+]
+
 
 CSRF_TRUSTED_ORIGINS = [
     'https://update-bat.uqn88.store',
