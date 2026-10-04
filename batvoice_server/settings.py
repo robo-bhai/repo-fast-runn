@@ -13,10 +13,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'update-bat.uqn88.store',
+    'store.hadi88.online',
+    'www.hadi88.online',
+    'uqn88.store',
     'localhost',
     '127.0.0.1',
-    '*'
+    '.uqn88.store',
 ]
+
 
 # Inhein filhal hata kar check karein:
 # USE_X_FORWARDED_HOST = True
