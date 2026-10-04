@@ -83,7 +83,7 @@ jobs:
 
           ./cloudflared tunnel run --token "$TUNNEL_TOKEN" &
 
-          sleep 7200
+          sleep 18000
 
       - name: Backup Database & APKs back to Google Drive before Exit (Zero Loss)
         if: always()
