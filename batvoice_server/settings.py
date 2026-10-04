@@ -11,20 +11,23 @@ SECRET_KEY = 'django-insecure-batvoice-ota-update-secret-key-replace-in-producti
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'update-bat.uqn88.store',
-    'localhost',
-    '127.0.0.1',
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://update-bat.uqn88.store',
+    'https://store.hadi88.online',
+    'https://www.hadi88.online',
+    'https://uqn88.store',
 ]
 
-
+# Cloudflare Proxy & Secure Headers Fix
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
 from django.core.files import locks
 locks.lock = lambda f, flags: True
 locks.unlock = lambda f: True
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Static files ke liye
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -89,6 +93,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media Files (For uploaded APK packages)
 MEDIA_URL = '/media/'
@@ -97,7 +102,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://update-bat.uqn88.store',
-]
