@@ -18,6 +18,9 @@ ALLOWED_HOSTS = [
     '*'
 ]
 
+# Inhein filhal hata kar check karein:
+# USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://update-bat.uqn88.store',
@@ -27,8 +30,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Cloudflare Proxy & Secure Headers Fix
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#USE_X_FORWARDED_HOST = True
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
 from django.core.files import locks
