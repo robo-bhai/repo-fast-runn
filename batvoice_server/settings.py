@@ -21,6 +21,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 ALLOWED_HOSTS = ['*']
 
+# Cloudflare Reverse Proxy & Secure Headers Fix for 400 Bad Request
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
 from django.core.files import locks
