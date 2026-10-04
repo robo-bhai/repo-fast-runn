@@ -11,27 +11,19 @@ SECRET_KEY = 'django-insecure-batvoice-ota-update-secret-key-replace-in-producti
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'update-bat.uqn88.store',
-    'store.hadi88.online',
-    'www.hadi88.online',
-    'uqn88.store',
-    'localhost',
-    '127.0.0.1',
-    '.uqn88.store',
-]
+# 1. Sabhi hosts ko allow karein taake Cloudflare tunnel ka header reject na ho
+ALLOWED_HOSTS = ['*']
 
+# 2. Cloudflare tunnel ke liye secure proxy headers enable karein
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Inhein filhal hata kar check karein:
-# USE_X_FORWARDED_HOST = True
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
+# 3. Custom dashboard aur admin ke POST/GET requests ke liye trusted origins define karein
 CSRF_TRUSTED_ORIGINS = [
     'https://update-bat.uqn88.store',
-    'https://store.hadi88.online',
-    'https://www.hadi88.online',
-    'https://uqn88.store',
+    'https://*.uqn88.store',
 ]
+
 
 # Cloudflare Proxy & Secure Headers Fix
 #USE_X_FORWARDED_HOST = True
