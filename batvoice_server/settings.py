@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'batvoice_server.settings.Debug400Middleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,6 +55,25 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# --- DEBUG 400 ERROR MIDDLEWARE ---
+import traceback
+from django.http import HttpResponse
+
+class Debug400Middleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return response
+
+    def process_exception(self, request, exception):
+        print("=== 400 / EXCEPTION CAUGHT ===")
+        traceback.print_exc()
+        return None
+
+
 
 ROOT_URLCONF = 'batvoice_server.urls'
 
