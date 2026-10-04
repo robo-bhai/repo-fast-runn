@@ -13,17 +13,14 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://update-bat.uqn88.store',
-    'https://store.hadi88.online',
+    'https://hadi88.online',
     'https://www.hadi88.online',
+    'https://store.hadi88.online',
 ]
 
-ALLOWED_HOSTS = [
-    'update-bat.uqn88.store',
-    'store.hadi88.online',
-    'www.hadi88.online',
-    'localhost',
-    '127.0.0.1',
-]
+
+ALLOWED_HOSTS = ['*']
+
 
 # Fix for Android/Termux file locking (Errno 38 Function not implemented)
 from django.core.files import locks

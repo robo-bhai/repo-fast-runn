@@ -43,6 +43,8 @@ jobs:
         run: |
           python manage.py migrate
           python manage.py collectstatic --noinput
+          python manage.py collectstatic --noinput
+
           
           # Yeh script check karegi ke agar user pehle se nahi hai toh naya bana degi automatically
           python manage.py shell -c "
