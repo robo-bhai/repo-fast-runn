@@ -35,13 +35,14 @@ jobs:
           rclone copy gdrive:batvoice_backup/db.sqlite3 ./ || echo "No previous DB found, starting fresh."
           rclone copy gdrive:batvoice_backup/media/ ./media/ || echo "No previous media found."
 
-      - name: Run Migrations & Ensure Superuser Exists
+      - name: Run Migrations, Collect Static & Ensure Superuser Exists
         env:
           DJANGO_SUPERUSER_USERNAME: ${{ secrets.SUPERUSER_NAME }}
           DJANGO_SUPERUSER_PASSWORD: ${{ secrets.SUPERUSER_PASSWORD }}
           DJANGO_SUPERUSER_EMAIL: "admin@uqn88.store"
         run: |
           python manage.py migrate
+          python manage.py collectstatic --noinput
           
           # Yeh script check karegi ke agar user pehle se nahi hai toh naya bana degi automatically
           python manage.py shell -c "
