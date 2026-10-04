@@ -136,3 +136,12 @@ CSRF_TRUSTED_ORIGINS = [
     'https://store.hadi88.online',
     'https://www.hadi88.online',
 ]
+# WhiteNoise Static Files Storage configuration for Production/Cloudflare Tunnel
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
