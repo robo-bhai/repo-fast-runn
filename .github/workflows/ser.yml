@@ -3,6 +3,11 @@ name: Fast BatVoice Server with GDrive, Superuser & Cloudflare Tunnel
 on:
   workflow_dispatch:
 
+# Yeh block ensure karega ke agar purana workflow chal raha hai, toh woh cancel ho jaye aur naya wala start ho
+concurrency:
+  group: fast-batvoice-server-running
+  cancel-in-progress: true
+
 jobs:
   run-server:
     runs-on: ubuntu-latest
@@ -44,7 +49,6 @@ jobs:
           python manage.py migrate
           python manage.py collectstatic --noinput
           
-          # Yeh script check karegi ke agar user pehle se nahi hai toh naya bana degi automatically
           python manage.py shell -c "
           from django.contrib.auth import get_user_model;
           User = get_user_model();
@@ -64,7 +68,6 @@ jobs:
           nohup gunicorn batvoice_server.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 320 > gunicorn.log 2>&1 &
           sleep 3
 
-
       - name: Start Cloudflare Tunnel (Permanent Domain)
         env:
           TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
@@ -78,14 +81,12 @@ jobs:
           echo " Server is live at: https://update-bat.uqn88.store"
           echo "=========================================="
 
-          # Named tunnel run jo aapke subdomain par traffic bhejega
           ./cloudflared tunnel run --token "$TUNNEL_TOKEN" &
 
-          # Server ko 2 ghante (7200 seconds) tak live rakhne ke liye
           sleep 7200
 
       - name: Backup Database & APKs back to Google Drive before Exit (Zero Loss)
-        if: always() # Chahe action timeout ho ya cancel, yeh step chal kar data Google Drive par save kar dega
+        if: always()
         run: |
           echo "Backing up database and media/APKs to Google Drive..."
           rclone copy ./db.sqlite3 gdrive:batvoice_backup/ || true
