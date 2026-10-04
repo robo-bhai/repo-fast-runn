@@ -57,6 +57,8 @@ jobs:
           "
 
       - name: Start Django Server with Gunicorn in Background
+        env:
+          DJANGO_API_KEY: ${{ secrets.DJANGO_API_KEY }}
         run: |
           pip install --no-cache-dir gunicorn
           nohup gunicorn batvoice_server.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 320 > gunicorn.log 2>&1 &
