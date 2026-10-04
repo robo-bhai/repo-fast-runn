@@ -56,10 +56,12 @@ jobs:
               print('Superuser already exists or username is empty.')
           "
 
-      - name: Start Django Server in Background
+      - name: Start Django Server with Gunicorn in Background
         run: |
-          python manage.py runserver 0.0.0.0:8000 &
+          pip install gunicorn
+          gunicorn batvoice_server.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 60 &
           sleep 3
+
 
       - name: Start Cloudflare Tunnel (Permanent Domain)
         env:
